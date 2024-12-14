@@ -4,12 +4,11 @@ pragma solidity ^0.8.0;
 /**
  * @title DigitalVendingMachine
  * @dev A simple digital vending machine contract that allows the owner to manage items and users to purchase them.
- * @description: The DigitalVendingMachine smart contract is a straightforward
+ * The DigitalVendingMachine smart contract is a straightforward
  * implementation of a vending machine on the Ethereum blockchain.
  * It allows the contract owner to manage a list of items available
  * for purchase and enables users to buy these items by sending Ether.
  */
-
 contract DigitalVendingMachine {
   // Ownership Management: The contract has an owner who can transfer ownership to another address.
 
@@ -38,6 +37,19 @@ contract DigitalVendingMachine {
 
   Item[] public items;
   uint256 public nextItemId;
+
+  // Events
+  event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+  event ItemAdded(uint256 indexed id, string name, uint256 price, uint256 quantity);
+  event ItemRemoved(uint256 indexed id);
+  event ItemPurchased(uint256 indexed id, address indexed buyer, uint256 quantity, uint256 totalPrice);
+  event FundsWithdrawn(address indexed owner, uint256 amount);
+
+  // Modifiers
+  modifier onlyOwner() {
+    require(msg.sender == owner, 'Not the contract owner');
+    _;
+  }
 
   constructor() {
     owner = msg.sender;
@@ -71,87 +83,86 @@ contract DigitalVendingMachine {
    * @dev Remove an item from the vending machine by its ID.
    * @param id The ID of the item to remove.
    */
-  function remoteItem(uint256 id) external onlyOwner {
+  function removeItem(uint256 id) external onlyOwner {
     uint256 index = _getItemIndex(id);
     require(index < items.length, 'Item does not exist');
 
     // Move the last item into the place of the item to delete
-    items[index] = items[items.length - 1]
+    items[index] = items[items.length - 1];
     items.pop();
     emit ItemRemoved(id);
   }
-   /**
-     * @dev Purchase an item from the vending machine.
-     * @param id The ID of the item to purchase.
-     * @param quantity The number of items to purchase.
-     */
-    function purchaseItem(uint256 id, uint256 quantity) external payable {
-        uint256 index = _getItemIndex(id);
-        require(index < items.length, "Item does not exist");
-        Item storage item = items[index];
-        require(quantity > 0, "Quantity must be greater than 0");
-        uint256 totalPrice = item.price * quantity;
+  /**
+   * @dev Purchase an item from the vending machine.
+   * @param id The ID of the item to purchase.
+   * @param quantity The number of items to purchase.
+   */
+  function purchaseItem(uint256 id, uint256 quantity) external payable {
+    uint256 index = _getItemIndex(id);
+    require(index < items.length, 'Item does not exist');
+    Item storage item = items[index];
+    require(quantity > 0, 'Quantity must be greater than 0');
+    uint256 totalPrice = item.price * quantity;
 
-        require(msg.value >= totalPrice, "Insufficient Ether sent!");
+    require(msg.value >= totalPrice, 'Insufficient Ether sent!');
 
-        // Update the item quantity 
-        item.quantity -= quantity;
+    // Update the item quantity
+    item.quantity -= quantity;
 
-        // Refund excess Ether if any
-        if(msg.value > totalPrice) {
-            payable(msg.sneder).transfer(msg.value - totalPrice);
-
-        }
-        emit ItemPurchased(id, msg.sender, quantity, totalPrice)
+    // Refund excess Ether if any
+    if (msg.value > totalPrice) {
+      payable(msg.sender).transfer(msg.value - totalPrice);
     }
+    emit ItemPurchased(id, msg.sender, quantity, totalPrice);
+  }
 
-     /**
-     * @dev Withdraw all Ether from the contract to the owner's address.
-     */
-    function withdrawFunds() external onlyOwner {
-        uint256 balance = address(this).balance;
-        require(balance > 0, "No funds to withdraw");
-        payable(owner).transfer(balance);
-        emit FundsWithdrawn(owner, balance);
-    }
+  /**
+   * @dev Withdraw all Ether from the contract to the owner's address.
+   */
+  function withdrawFunds() external onlyOwner {
+    uint256 balance = address(this).balance;
+    require(balance > 0, 'No funds to withdraw');
+    payable(owner).transfer(balance);
+    emit FundsWithdrawn(owner, balance);
+  }
 
-     /**
-     * @dev Get the total number of items in the vending machine.
-     * @return The number of items.
-     */
-    function getItemCount() external view returns (uint256) {
-        return items.length;
+  /**
+   * @dev Get the total number of items in the vending machine.
+   * @return The number of items.
+   */
+  function getItemCount() external view returns (uint256) {
+    return items.length;
+  }
+  /**
+   * @dev Retrieve item details by index.
+   * @param index The index of the item in the array.
+   * @return id The ID of the item.
+   * @return name The name of the item.
+   * @return price The price of the item in wei.
+   * @return quantity The available quantity of the item.
+   */
+  function getItem(
+    uint256 index
+  ) external view returns (uint256 id, string memory name, uint256 price, uint256 quantity) {
+    require(index < items.length, 'Item does not exit');
+    Item storage item = items[index];
+    return (item.id, item.name, item.price, item.quantity);
+  }
+  /**
+   * @dev Internal function to find the index of an item by its ID.
+   * @param id The ID of the item.
+   * @return index The index of the item in the array.
+   */
+  function _getItemIndex(uint256 id) internal view returns (uint256 index) {
+    for (uint256 i = 0; i < items.length; i++) {
+      if (items[i].id == id) {
+        return i;
+      }
     }
- /**
-     * @dev Retrieve item details by index.
-     * @param index The index of the item in the array.
-     * @return id The ID of the item.
-     * @return name The name of the item.
-     * @return price The price of the item in wei.
-     * @return quantity The available quantity of the item.
-     */
-    function getItem(uint256 index) external view returns (uint256 id, string memory name, uint256 price, uint256 quantity) {
-        require(index < items.length, "Item does not exit");
-        Item storage item = items[index];
-        return(item.id, item.name, item.price, item.quantity)l;
-    }
- /**
-     * @dev Internal function to find the index of an item by its ID.
-     * @param id The ID of the item.
-     * @return index The index of the item in the array.
-     */
-    function _getItemIndex(uint256 id) internal view returns (uint256 index) {
-        for (uint256 i = 0; i < items.length; i++) {
-            if (items[i].id == id) {
-                return i;
-            }
-        }
-        revert("Item not found!");
-    }
-    // Fallback function to accept Ether
-    receive() external payable {
+    revert('Item not found!');
+  }
+  // Fallback function to accept Ether
+  receive() external payable {
     emit FundsWithdrawn(msg.sender, msg.value);
-    }
-
+  }
 }
-
