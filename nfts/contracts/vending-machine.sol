@@ -104,4 +104,54 @@ contract DigitalVendingMachine {
         }
         emit ItemPurchased(id, msg.sender, quantity, totalPrice)
     }
+
+     /**
+     * @dev Withdraw all Ether from the contract to the owner's address.
+     */
+    function withdrawFunds() external onlyOwner {
+        uint256 balance = address(this).balance;
+        require(balance > 0, "No funds to withdraw");
+        payable(owner).transfer(balance);
+        emit FundsWithdrawn(owner, balance);
+    }
+
+     /**
+     * @dev Get the total number of items in the vending machine.
+     * @return The number of items.
+     */
+    function getItemCount() external view returns (uint256) {
+        return items.length;
+    }
+ /**
+     * @dev Retrieve item details by index.
+     * @param index The index of the item in the array.
+     * @return id The ID of the item.
+     * @return name The name of the item.
+     * @return price The price of the item in wei.
+     * @return quantity The available quantity of the item.
+     */
+    function getItem(uint256 index) external view returns (uint256 id, string memory name, uint256 price, uint256 quantity) {
+        require(index < items.length, "Item does not exit");
+        Item storage item = items[index];
+        return(item.id, item.name, item.price, item.quantity)l;
+    }
+ /**
+     * @dev Internal function to find the index of an item by its ID.
+     * @param id The ID of the item.
+     * @return index The index of the item in the array.
+     */
+    function _getItemIndex(uint256 id) internal view returns (uint256 index) {
+        for (uint256 i = 0; i < items.length; i++) {
+            if (items[i].id == id) {
+                return i;
+            }
+        }
+        revert("Item not found!");
+    }
+    // Fallback function to accept Ether
+    receive() external payable {
+    emit FundsWithdrawn(msg.sender, msg.value);
+    }
+
 }
+
