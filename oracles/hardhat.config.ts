@@ -34,6 +34,11 @@ const config: HardhatUserConfig = {
       accounts: [WALLET_PRIVATE_KEY as string],
       gasPrice: 1000000000,
     },
+    zkEVM: {
+      url: `https://rpc.cardona.zkevm-rpc.com`,
+      accounts: [WALLET_PRIVATE_KEY as string],
+      gasPrice: 1000000000,
+    },
     hardhat: {
       chainId: 1337,
     },
