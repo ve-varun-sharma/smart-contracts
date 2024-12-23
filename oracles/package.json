@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "btc-oracle-server": "node ./src/bitcoinPriceOracle.js"
+    "btc-oracle-server": "node ./src/bitcoinPriceOracle.js",
+    "deploy-to-testnet": "npx hardhat run src/deployment-scripts/deployBtcPriceOracle.js --network base-sepolia"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
