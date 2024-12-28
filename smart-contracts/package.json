@@ -5,6 +5,9 @@
     "deploy-to-zkevm": "npx hardhat run src/deployment-scripts/deployBtcPriceOracle.js --network zkEVM",
     "test": "npx hardhat test"
   },
+  "engines": {
+    "node": "18.17.0"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
     "@nomicfoundation/hardhat-ethers": "^3.0.0",
