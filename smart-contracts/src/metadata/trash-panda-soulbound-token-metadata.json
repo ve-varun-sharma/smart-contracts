@@ -1,0 +1,15 @@
+{
+  "name": "Trash Panda Blue Jay",
+  "description": "Ah, the epitome of Toronto style: a trash panda (raccoon), redefining 'urban chic' while simultaneously desecrating our garbage bins. And of course, it's gotta be sporting the official team headwear. Because nothing screams 'sophistication' like pilfering discarded pizza boxes while decked out in Jays gear. Truly, a fashion icon for the ages.",
+  "image": "https://storage.googleapis.com/web3-nfts/trash-panda-nft/to_panda_summer.png",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "SoulBound"
+    },
+    {
+      "trait_type": "raccoon",
+      "value": "blue-jay"
+    }
+  ]
+}

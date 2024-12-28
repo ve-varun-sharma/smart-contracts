@@ -2,52 +2,42 @@
 pragma solidity ^0.8.7;
 
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
+import '@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 
-/**
- * @title SoulBoundToken
- * @dev Implementation of a non-transferrable NFT (SoulBound Token)
- * Once minted, these tokens cannot be transferred between addresses
- * They can only be minted by the contract owner and burned by the token owner
- */
-contract SoulBoundToken is ERC721, Ownable {
-  /// @dev Counter for token IDs, increments with each mint
+contract TrashPandaBadge is ERC721, ERC721URIStorage, Ownable {
   uint256 private _tokenIdCounter;
+  string private _baseTokenURI;
 
-  /**
-   * @dev Constructor initializes the contract with a name and symbol
-   * Sets the contract deployer as the initial owner
-   */
-  constructor() ERC721('SoulBoundToken', 'SBT') Ownable(msg.sender) {}
+  constructor() ERC721('TrashPandaBadge', 'TRASH') Ownable(msg.sender) {
+    _baseTokenURI = 'https://storage.googleapis.com/web3-nfts/trash-panda-nft/trash-panda-soulbound-token-metadata.json';
+  }
 
-  /**
-   * @dev Mints a new token to the specified address
-   * @param to The address that will own the minted token
-   * @notice Only the contract owner can mint new tokens
-   */
-  function safeMint(address to) public onlyOwner {
+  function safeMint(address to, string memory uri) public onlyOwner {
     uint256 tokenId = _tokenIdCounter;
     _tokenIdCounter++;
     _safeMint(to, tokenId);
+    _setTokenURI(tokenId, uri);
   }
 
-  /**
-   * @dev Burns a specific token
-   * @param tokenId The ID of the token to burn
-   * @notice Only the owner of the token can burn it
-   */
   function burn(uint256 tokenId) external {
     require(ownerOf(tokenId) == msg.sender, 'Only the owner of the token can burn it.');
     _burn(tokenId);
   }
 
-  /**
-   * @dev Internal function to enforce non-transferability of tokens
-   * @param from The current owner of the token
-   * @param to The address to receive the token
-   * @notice Allows only minting (from zero address) and burning (to zero address)
-   */
   function _beforeTokenTransfer(address from, address to, uint256) internal pure {
     require(from == address(0) || to == address(0), 'This token cannot be transferred');
+  }
+
+  function _burn(uint256 tokenId) internal override(ERC721) {
+    super._burn(tokenId);
+  }
+
+  function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
+    return super.tokenURI(tokenId);
+  }
+
+  function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721URIStorage) returns (bool) {
+    return super.supportsInterface(interfaceId);
   }
 }
