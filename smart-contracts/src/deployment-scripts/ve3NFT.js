@@ -20,6 +20,14 @@ async function main() {
 
   const [deployer] = await hardhat.ethers.getSigners()
 
+  // Get network information
+  const network = await hardhat.ethers.provider.getNetwork()
+  console.log('Network:', {
+    name: network.name,
+    chainId: network.chainId.toString(),
+    ensAddress: network.ensAddress || 'none',
+  })
+
   console.log('Deploying contracts with the account:', deployer.address)
 
   // Grab the contract factory
@@ -29,8 +37,18 @@ async function main() {
   // Estimate gas using proper ethers v6 syntax
   const deployTx = await Ve3NFT.getDeployTransaction()
   const estimatedGas = await deployer.estimateGas(deployTx)
+
+  // Get current gas price
+  const gasPrice = await hardhat.ethers.provider.getFeeData()
+
+  // Calculate total cost in wei
+  const totalCostWei = estimatedGas * gasPrice.gasPrice
+  const totalCostEth = hardhat.ethers.formatEther(totalCostWei)
+
   // Both estimatedGas and gasPrice should be BigNumbers
   console.log(`Estimated gas cost = ${estimatedGas.toString()}`)
+  console.log(`Current gas price: ${hre.ethers.formatUnits(gasPrice.gasPrice, 'gwei')} gwei`)
+  console.log(`Total cost in ETH: ${totalCostEth}`)
 
   // Prompt the user to proceed or reject
   const terminalRl = readline.createInterface({
