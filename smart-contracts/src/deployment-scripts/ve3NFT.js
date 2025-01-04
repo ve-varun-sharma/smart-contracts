@@ -22,6 +22,9 @@ async function main() {
 
   // Get network information
   const network = await hardhat.ethers.provider.getNetwork()
+
+  // Get network currency symbol
+  const currencySymbol = network.name === 'polygonzkEVM' ? 'MATIC' : 'ETH'
   console.log('Network:', {
     name: network.name,
     chainId: network.chainId.toString(),
@@ -48,20 +51,25 @@ async function main() {
   // Calculate total cost (both values are already BigInt)
   const totalCost = estimatedGas * gasPrice
 
-  // Format values for display
-  const formattedGasPrice = hardhat.ethers.formatUnits(gasPrice, 'gwei')
-  const formattedTotalCost = hardhat.ethers.formatEther(totalCost)
-  const formattedBalance = hardhat.ethers.formatEther(balance)
+  const rawBalance = balance.toString()
 
-  // Log values
+  // Format values with full precision
+  const formattedGasPrice = hardhat.ethers.formatUnits(gasPrice, 'gwei')
+  const formattedTotalCost = hardhat.ethers.formatUnits(totalCost, 18)
+  const formattedBalance = hardhat.ethers.formatUnits(balance, 18)
+
+  // Debug logs with raw values
+  console.log('Raw balance:', rawBalance)
   console.log(`Estimated gas units: ${estimatedGas.toString()}`)
   console.log(`Current gas price: ${formattedGasPrice} gwei`)
-  console.log(`Total cost in ETH: ${Number(formattedTotalCost).toFixed(18)}`)
-  console.log(`Account balance: ${Number(formattedBalance).toFixed(18)}`)
+  console.log(`Total cost in ${currencySymbol}: ${formattedTotalCost}`)
+  console.log(`Account balance in ${currencySymbol}: ${formattedBalance}`)
 
   // Validate sufficient funds
   if (balance < totalCost) {
-    throw new Error(`Insufficient funds. Need ${formattedTotalCost} ETH but have ${formattedBalance} ETH`)
+    throw new Error(
+      `Insufficient funds. Need ${formattedTotalCost} ${currencySymbol} but have ${formattedBalance} ${currencySymbol}`,
+    )
   }
   console.log('Sufficient funds available, proceeding with deployment...')
 

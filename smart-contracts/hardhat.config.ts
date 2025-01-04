@@ -30,6 +30,7 @@ const config: HardhatUserConfig = {
       url: 'https://sepolia.base.org',
       accounts: [WALLET_PRIVATE_KEY as string],
       gasPrice: 1000000000,
+      chainId: 84532,
     },
     // for local dev environment
     'base-local': {
