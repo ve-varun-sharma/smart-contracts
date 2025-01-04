@@ -1,0 +1,19 @@
+{
+  "name": "Ve3 NFT #1",
+  "description": "Ve's NFT business card - learn more about Ve by scanning the QR code - it goes to his portfolio site. (Not crypto scam). But I suppose that's what a crypto scammer would say.",
+  "image": "https://storage.googleapis.com/web3-nfts/ve-nfts/ve3-sharma-nft.png",
+  "attributes": [
+    {
+      "trait_type": "Name",
+      "value": "Ve Varun Sharma"
+    },
+    {
+      "trait_type": "Role",
+      "value": "CTO/Head of Engineering"
+    },
+    {
+      "trait_type": "Website",
+      "value": "https://vesharma.dev"
+    }
+  ]
+}
