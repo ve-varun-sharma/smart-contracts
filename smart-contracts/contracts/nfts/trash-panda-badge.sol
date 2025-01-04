@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.4;
 import '@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 
 // https://www.quicknode.com/guides/ethereum-development/smart-contracts/how-to-create-a-soulbound-token
-contract TrashPandaBadge is ERC721URIStorage, Ownable {
+contract TrashPandaBadge is Ownable, ERC721URIStorage {
   uint256 private _tokenIdCounter;
   string private _baseTokenURI;
 
@@ -34,8 +34,8 @@ contract TrashPandaBadge is ERC721URIStorage, Ownable {
   }
 
   // _burn is not virtual in ERC721, but virtual in ERC721URIStorage, so override only from ERC721URIStorage
-  function _burn(uint256 tokenId) internal virtual override(ERC721URIStorage) {
-    super._burn(tokenId); // calls ERC721URIStorage._burn, which also calls ERC721._burn internally
+  function _burn(uint256 tokenId) internal virtual override {
+    return super._burn(tokenId); // calls ERC721URIStorage._burn, which also calls ERC721._burn internally
   }
 
   // tokenURI is virtual in both ERC721 and ERC721URIStorage, so override both
