@@ -38,17 +38,32 @@ async function main() {
   const deployTx = await Ve3NFT.getDeployTransaction()
   const estimatedGas = await deployer.estimateGas(deployTx)
 
-  // Get current gas price
-  const gasPrice = await hardhat.ethers.provider.getFeeData()
+  // Check wallet balance
+  const balance = await deployer.provider.getBalance(deployer.address)
 
-  // Calculate total cost in wei
-  const totalCostWei = estimatedGas * gasPrice.gasPrice
-  const totalCostEth = hardhat.ethers.formatEther(totalCostWei)
+  // Get current gas price using getFeeData
+  const feeData = await hardhat.ethers.provider.getFeeData()
+  const gasPrice = feeData.gasPrice
 
-  // Both estimatedGas and gasPrice should be BigNumbers
-  console.log(`Estimated gas cost = ${estimatedGas.toString()}`)
-  console.log(`Current gas price: ${hre.ethers.formatUnits(gasPrice.gasPrice, 'gwei')} gwei`)
-  console.log(`Total cost in ETH: ${totalCostEth}`)
+  // Calculate total cost (both values are already BigInt)
+  const totalCost = estimatedGas * gasPrice
+
+  // Format values for display
+  const formattedGasPrice = hardhat.ethers.formatUnits(gasPrice, 'gwei')
+  const formattedTotalCost = hardhat.ethers.formatEther(totalCost)
+  const formattedBalance = hardhat.ethers.formatEther(balance)
+
+  // Log values
+  console.log(`Estimated gas units: ${estimatedGas.toString()}`)
+  console.log(`Current gas price: ${formattedGasPrice} gwei`)
+  console.log(`Total cost in ETH: ${Number(formattedTotalCost).toFixed(18)}`)
+  console.log(`Account balance: ${Number(formattedBalance).toFixed(18)}`)
+
+  // Validate sufficient funds
+  if (balance < totalCost) {
+    throw new Error(`Insufficient funds. Need ${formattedTotalCost} ETH but have ${formattedBalance} ETH`)
+  }
+  console.log('Sufficient funds available, proceeding with deployment...')
 
   // Prompt the user to proceed or reject
   const terminalRl = readline.createInterface({

@@ -6,6 +6,9 @@ const WALLET_PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY
 if (!WALLET_PRIVATE_KEY) {
   console.log('Missing env var: WALLET_PRIVATE_KEY')
 }
+if (WALLET_PRIVATE_KEY) {
+  console.log('Sanity Check - We have Private Wallet key.')
+}
 
 const config: HardhatUserConfig = {
   solidity: '0.8.28',
@@ -34,8 +37,18 @@ const config: HardhatUserConfig = {
       accounts: [WALLET_PRIVATE_KEY as string],
       gasPrice: 1000000000,
     },
-    zkEVM: {
+    zkEvmTestnet: {
       url: `https://rpc.cardona.zkevm-rpc.com`,
+      accounts: [WALLET_PRIVATE_KEY as string],
+      gasPrice: 1000000000,
+    },
+    polygon: {
+      url: `https://polygon-rpc.com`,
+      accounts: [WALLET_PRIVATE_KEY as string],
+      gasPrice: 1000000000,
+    },
+    polygonzkEVM: {
+      url: `https://zkevm-rpc.com`,
       accounts: [WALLET_PRIVATE_KEY as string],
       gasPrice: 1000000000,
     },
