@@ -20,11 +20,15 @@ async function main() {
 
   const [deployer] = await hardhat.ethers.getSigners()
 
+  // Get current nonce
+  const nonce = await deployer.getNonce()
+  console.log('Current nonce:', nonce)
+
   // Get network information
   const network = await hardhat.ethers.provider.getNetwork()
 
   // Get network currency symbol
-  const currencySymbol = network.name === 'polygonzkEVM' ? 'MATIC' : 'ETH'
+  const currencySymbol = network.name === 'polygon' ? 'MATIC' : 'ETH'
   console.log('Network:', {
     name: network.name,
     chainId: network.chainId.toString(),
@@ -87,8 +91,24 @@ async function main() {
     console.log('ABOUT TO DEPLOY')
     // Deploy contract
     const baseURI = 'https://storage.googleapis.com/web3-nfts/ve-nfts/ve3-nft-metadata.json'
-    const ve3NFT = await Ve3NFT.deploy()
-    await ve3NFT.waitForDeployment()
+
+    // Deploy with explicit nonce and higher gas price
+    const deploymentOptions = {
+      nonce: nonce,
+      gasLimit: estimatedGas * BigInt(2), // Double gas limit for safety
+      gasPrice: ((await hardhat.ethers.provider.getFeeData()).gasPrice * BigInt(12)) / BigInt(10), // 20% higher
+    }
+
+    console.log('Deployment options:', {
+      nonce: deploymentOptions.nonce,
+      gasLimit: deploymentOptions.gasLimit.toString(),
+      gasPrice: hardhat.ethers.formatUnits(deploymentOptions.gasPrice, 'gwei') + ' gwei',
+    })
+
+    const ve3NFT = await Ve3NFT.deploy(deploymentOptions)
+
+    // const ve3NFT = await Ve3NFT.deploy()
+    // await ve3NFT.waitForDeployment()
 
     console.log('Ve3NFT deployed to:', await ve3NFT.getAddress())
     // Set base URI
@@ -96,7 +116,7 @@ async function main() {
     console.log('Base URI set to:', baseURI)
 
     // Wait for few block confirmations to ensure deployment is confirmed
-    await ve3NFT.deployTransaction.wait(6)
+    // await ve3NFT.deployTransaction.wait(6)
 
     // Verify the contract on Etherscan
     // if (process.env.ETHERSCAN_API_KEY) {
@@ -111,7 +131,7 @@ async function main() {
     //   }
     // }
 
-    console.log('Ve3NFT contract deployed to:', ve3NFT.address)
+    console.log('Ve3NFT contract deployed to:', ve3NFT.getAddress())
   } else {
     console.log('Deployment cancelled.')
   }
@@ -120,7 +140,11 @@ async function main() {
 
 main()
   .then(() => process.exit(0))
-  .catch(error => {
-    console.error(error)
+  .catch(async error => {
+    if (error.message.includes('ALREADY_EXISTS')) {
+      console.log('Transaction already pending. Please wait or increase gas price.')
+    } else {
+      console.error(error)
+    }
     process.exit(1)
   })

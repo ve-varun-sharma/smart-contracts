@@ -15,7 +15,7 @@ contract Ve3NFT is ERC721URIStorage, Ownable {
   event BaseURIChanged(string newBaseURI);
 
   constructor() ERC721('Ve3NFT', 'VE3') Ownable(msg.sender) {
-    _baseTokenURI = 'https://storage.googleapis.com/web3-nfts/ve-nfts/vesharma.dev%20%20QR%20code.png';
+    _baseTokenURI = 'https://storage.googleapis.com/web3-nfts/ve-nfts/ve3-nft-metadata.json';
   }
 
   function _baseURI() internal view virtual override returns (string memory) {
