@@ -148,3 +148,4 @@ main()
     }
     process.exit(1)
   })
+// Ve3NFT deployed to: 0x24E8ffdB8c50ecB25bE1dC26F0561A387d763d50
