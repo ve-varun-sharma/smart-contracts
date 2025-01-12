@@ -90,7 +90,7 @@ async function main() {
 
     console.log('ABOUT TO DEPLOY')
     // Deploy contract
-    const baseURI = 'https://storage.googleapis.com/web3-nfts/ve-nfts/ve3-nft-metadata.json'
+    const newMetadataURL = 'https://storage.googleapis.com/web3-nfts/ve-nfts/ve3-nft-metadata.json'
 
     // Deploy with explicit nonce and higher gas price
     const deploymentOptions = {
@@ -112,8 +112,8 @@ async function main() {
 
     console.log('Ve3NFT deployed to:', await ve3NFT.getAddress())
     // Set base URI
-    await ve3NFT.setBaseURI(baseURI)
-    console.log('Base URI set to:', baseURI)
+    await ve3NFT.setMetadataURL(newMetadataURL)
+    console.log('META DATA URL set to:', newMetadataURL)
 
     // Wait for few block confirmations to ensure deployment is confirmed
     // await ve3NFT.deployTransaction.wait(6)

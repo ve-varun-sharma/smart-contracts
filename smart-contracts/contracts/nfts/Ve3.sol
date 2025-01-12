@@ -3,38 +3,31 @@ pragma solidity ^0.8.7;
 
 import '@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
-import '@openzeppelin/contracts/utils/Strings.sol';
 
 contract Ve3NFT is ERC721URIStorage, Ownable {
-  using Strings for uint256;
-
   uint256 private _tokenIds;
-  string private _baseTokenURI;
+  string private _metadataURL;
 
-  // emit event for transparency of base uri changing
-  event BaseURIChanged(string newBaseURI);
+  event MetadataURLChanged(string newMetadataURL);
 
   constructor() ERC721('Ve3NFT', 'VE3') Ownable(msg.sender) {
-    _baseTokenURI = 'https://storage.googleapis.com/web3-nfts/ve-nfts/ve3-nft-metadata.json';
+    _metadataURL = 'https://storage.googleapis.com/web3-nfts/ve-nfts/ve3-nft-metadata.json';
   }
 
-  function _baseURI() internal view virtual override returns (string memory) {
-    return _baseTokenURI;
+  function setMetadataURL(string memory metadataURL) public onlyOwner {
+    _metadataURL = metadataURL;
+    emit MetadataURLChanged(metadataURL);
   }
 
-  function setBaseURI(string memory baseURI) public onlyOwner {
-    // only the owner can set the base uri to prevent security issues
-    _baseTokenURI = baseURI;
-    emit BaseURIChanged(baseURI);
-  }
-
-  function mintNFT(address recipient, string memory tokenURI) public returns (uint256) {
+  function mintNFT(address recipient) public returns (uint256) {
     _tokenIds++;
-
     uint256 newItemId = _tokenIds;
     _mint(recipient, newItemId);
-    _setTokenURI(newItemId, tokenURI);
-
+    _setTokenURI(newItemId, _metadataURL);
     return newItemId;
+  }
+
+  function getMetadataURL() public view returns (string memory) {
+    return _metadataURL;
   }
 }
