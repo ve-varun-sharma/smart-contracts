@@ -1,6 +1,28 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+// Documentation: RewardsManager Smart Contract
+
+// 1. Introduction
+
+// The RewardsManager smart contract is designed to manage a multi-faceted rewards system, incorporating role-based permissions and a proposal-based execution mechanism. This contract facilitates the administration of achievement-based and payout-based rewards, as well as the management of associated configurations and velocity controls.
+
+// The core principle is that actions are initiated by specific roles (e.g., Achievement Managers and Reward Managers) through "proposals". These proposals must be approved by a set number of team members before being executed on-chain. This approach ensures that the reward system is managed securely and collaboratively.
+
+// 2. Key Features
+
+// Role-Based Access Control: Implements roles such as Administrator, Achievement Manager, and Reward Manager, each with distinct permissions.
+
+// Proposal System: Uses a proposal mechanism to suggest, review, and execute changes to the rewards infrastructure.
+
+// Approval Thresholds: Allows configurable approval thresholds per role, requiring a certain number of approvals for a proposal to pass.
+
+// Achievement Management: Enables the administration of achievement IDs, including stopping minting on certain IDs.
+
+// Reward Management: Facilitates the setup, adjustment, and NFT assignment to rewards, and also the management of velocity controls.
+
+// Event-Driven: Emits detailed events for key actions like role changes, proposal creation, approvals, rejections and executions.
+
 contract RewardsManager {
   // --- Role Management ---
   enum Role {
