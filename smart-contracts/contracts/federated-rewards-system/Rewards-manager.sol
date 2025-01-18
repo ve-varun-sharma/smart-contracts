@@ -169,16 +169,19 @@ contract RewardsManager {
 
   // --- Proposal Submission Functions ---
 
+  //  Submits a proposal to add new achievement ids.
   function proposeNewAchievements(uint256[] memory ids) public onlyRole(Role.ACHIEVEMENT_MANAGER) {
     bytes memory data = abi.encode(ids);
     _createProposal(ProposalType.NEW_ACHIEVEMENTS, data);
   }
 
+  // Submits a proposal to stop minting for given achievement ids.
   function proposeMintingStopped(uint256[] memory ids) public onlyRole(Role.ACHIEVEMENT_MANAGER) {
     bytes memory data = abi.encode(ids);
     _createProposal(ProposalType.STOP_MINTING, data);
   }
 
+  //  Submits a proposal to add a series of rewards to a quest.
   function proposeRewards(
     uint256[] memory ids,
     uint256[] memory rewardTypes,
@@ -190,7 +193,7 @@ contract RewardsManager {
     bytes memory data = abi.encode(ids, rewardTypes, rewardTokens, totalRewards, rewardsPerTokens, nftIds);
     _createProposal(ProposalType.REWARDS_PROPOSAL, data);
   }
-
+  //Submits a proposal to adjust the reward values.
   function proposeRewardAdjustment(
     uint256[] memory ids,
     uint256[] memory rewards_indexes,
@@ -203,6 +206,7 @@ contract RewardsManager {
     _createProposal(ProposalType.REWARD_ADJUSTMENT, data);
   }
 
+  //  Submits a proposal to add nfts to a reward.
   function proposeNfts(
     uint256[] memory ids,
     uint256[] memory reward_indexes,
@@ -211,6 +215,8 @@ contract RewardsManager {
     bytes memory data = abi.encode(ids, reward_indexes, nftIds);
     _createProposal(ProposalType.NFT_PROPOSAL, data);
   }
+
+  //  Submits a proposal to set or modify the velocity control values.
 
   function proposeVelocityControl(
     uint256 id,
@@ -265,6 +271,7 @@ contract RewardsManager {
     }
   }
 
+  //
   function _executeProposal(uint256 _proposalId, Proposal storage proposal) private {
     //We should create a struct of handlers
     if (proposal.proposalType == ProposalType.NEW_ACHIEVEMENTS) {
