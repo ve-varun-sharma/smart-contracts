@@ -25,6 +25,35 @@ pragma solidity ^0.8.0;
 
 contract RewardsManager {
   // --- Role Management ---
+
+  //   3. Roles and Permissions
+
+  // Administrator (ADMIN):
+
+  // Can grant or revoke any role (grantRole, revokeRole).
+
+  // Can set proposal approval thresholds for different roles (setRoleApprovalThreshold).
+
+  // Can reject any proposal without requiring a threshold.(rejectProposal)
+
+  // Has access to all other functions.
+
+  // Achievement Manager (ACHIEVEMENT_MANAGER):
+
+  // Can propose the addition of new achievement IDs (proposeNewAchievements).
+
+  // Can propose to stop minting for existing achievement IDs (proposeMintingStopped).
+
+  // Reward Manager (REWARD_MANAGER):
+
+  // Can propose reward configurations for quests, including reward tokens, totals, and per-token amounts (proposeRewards).
+
+  // Can propose adjustments to existing reward configurations (proposeRewardAdjustment).
+
+  // Can propose assignments of NFTs to rewards (proposeNfts).
+
+  // Can propose new velocity controls or updates to existing ones (proposeVelocityControl).
+
   enum Role {
     ADMIN,
     ACHIEVEMENT_MANAGER,
@@ -70,6 +99,18 @@ contract RewardsManager {
   }
 
   // --- Proposal Struct and Storage ---
+
+  //   State Variables:
+
+  // roles: Mapping from address to Role to track the role assigned to an address.
+
+  // roleApprovalThresholds: Mapping from Role to uint256 representing the required approval count for a proposal from that role.
+
+  // proposals: Mapping from uint256 (proposal ID) to Proposal struct.
+
+  // proposalsByType: Mapping of ProposalType to a list of proposalId
+
+  // proposalCount: Tracks the number of proposals created.
   struct Proposal {
     address proposer;
     ProposalType proposalType;
@@ -92,6 +133,16 @@ contract RewardsManager {
   mapping(uint256 => Proposal) public proposals;
   mapping(ProposalType => uint256[]) public proposalsByType;
 
+  // Events:
+  // RoleGranted, RoleRevoked: Emitted when roles are granted or revoked.
+
+  // ProposalCreated: Emitted when a new proposal is created.
+
+  // ProposalApproved: Emitted when a proposal is approved by a team member.
+
+  // ProposalExecuted: Emitted when a proposal meets its approval threshold and is executed.
+
+  // ProposalRejected: Emitted when a proposal is rejected by an admin.
   event ProposalCreated(uint256 indexed proposalId, ProposalType proposalType, address indexed proposer);
   event ProposalApproved(uint256 indexed proposalId, address indexed approver);
   event ProposalExecuted(uint256 indexed proposalId);
