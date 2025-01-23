@@ -379,3 +379,67 @@ contract RewardsManager {
     // Emit relevant event
   }
 }
+
+// 6. How to Use
+
+// Deployment: Deploy the contract to your desired network. The address that deploys this contract is given the ADMIN role.
+
+// Role Assignment: The administrator can assign the ACHIEVEMENT_MANAGER and REWARD_MANAGER roles to the appropriate addresses using the grantRole function.
+
+// Approval Thresholds: The admin can set the approval threshold for each role through the setRoleApprovalThreshold function.
+
+// Proposal Submission:
+
+// Members with ACHIEVEMENT_MANAGER can propose new achievements or stop minting on achievements, by calling their corresponding functions, passing in the data that needs to be used.
+
+// Members with REWARD_MANAGER can propose new rewards, adjust rewards, add nfts to rewards, or create new velocity control settings, by calling their corresponding functions and passing in their necessary data.
+
+// Proposal Approval: Other members of the same role must approve proposals, by calling the approveProposal function.
+
+// Proposal Execution: Once the approval threshold for a proposal has been met, it is executed.
+
+// Data Handling: As you set up the handler functions (_handleNewAchievements, etc.) you can fetch the data from the data field of the proposal by decoding the bytes with abi.decode.
+
+// Walkthrough: Basic Usage Example
+
+// Setup:
+
+// Deploy the RewardsManager contract.
+
+// Note down the address of the deployed contract, this will be used throughout the rest of the walkthrough.
+
+// Let's say, your address 0xAdmin has deployed the contract. You now have the admin role.
+
+// Your address 0xAchievementManager will be the address that has the achievement manager role.
+
+// Your address 0xRewardManager will be the address that has the reward manager role.
+
+// 0xAdmin gives the role of ACHIEVEMENT_MANAGER to the address 0xAchievementManager, by calling the grantRole function: rewardsManager.grantRole(0xAchievementManager, 1); (1 is the enum value for ACHIEVEMENT_MANAGER)
+
+// 0xAdmin gives the role of REWARD_MANAGER to the address 0xRewardManager, by calling the grantRole function: rewardsManager.grantRole(0xRewardManager, 2); (2 is the enum value for REWARD_MANAGER)
+
+// 0xAdmin Sets the approval threshold for the ACHIEVEMENT_MANAGER to 2: rewardsManager.setRoleApprovalThreshold(1, 2);
+
+// 0xAdmin Sets the approval threshold for the REWARD_MANAGER to 2: rewardsManager.setRoleApprovalThreshold(2, 2);
+
+// Now, only proposals from 0xAchievementManager or 0xRewardManager must be approved by two members of their respective roles in order for it to execute.
+
+// Proposing New Achievements:
+
+// 0xAchievementManager proposes new achievements (ids 100, 101, 102) by calling rewardsManager.proposeNewAchievements([100, 101, 102]). This function returns the id of the proposal that was created.
+
+// Let's say the proposal id is 0.
+
+// The other achievement manager, in this case we'll pretend it's 0xAnotherAchievementManager, must approve the proposal by calling rewardsManager.approveProposal(0).
+
+// If a second member with the achievement manager role calls the approveProposal function, the proposal is now executed, and the event ProposalExecuted will be emitted, and the _handleNewAchievements function would have run with the given data.
+
+// Setting a Rewards Proposal
+
+// 0xRewardManager proposes a new set of rewards for quest id 1 (with a reward token 0xRewardToken, 1000 total rewards, and 1 reward token per claim), by calling the function: rewardsManager.proposeRewards([1], [0], [0xRewardToken], [1000], [1], [[]]) (0 is the rewardType , empty array indicates no NFTs). This function returns the proposal id.
+
+// Let's say the proposal id is 1.
+
+// Another reward manager (i.e. 0xAnotherRewardManager) approves the proposal with id 1 by calling rewardsManager.approveProposal(1).
+
+// If another REWARD_MANAGER approves the proposal, the proposal will be executed, and the ProposalExecuted event will be emitted, and the _handleRewardsProposal function would have run with the given data.
